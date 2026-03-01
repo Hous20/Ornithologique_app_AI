@@ -1,0 +1,9 @@
+.card-header {
+  display: grid;
+  grid-auto-rows: min-content;
+  grid-template-rows: auto auto;
+  align-items: start;
+  gap: 0.375rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
