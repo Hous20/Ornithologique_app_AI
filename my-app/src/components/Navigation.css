@@ -1,0 +1,83 @@
+/* --- BARRE DE NAVIGATION --- */
+.navbar {
+  background: linear-gradient(to right, #0891b2, #059669); /* Cyan vers Emerald */
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.navbar-container {
+  max-width: 1280px; /* max-w-7xl */
+  margin: 0 auto;
+  padding: 0 16px; /* px-4 */
+}
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px; /* h-16 */
+}
+
+/* --- LOGO --- */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* gap-2 */
+  text-decoration: none;
+  color: white;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.logo-text {
+  font-weight: 600;
+  font-size: 1.125rem; /* text-lg */
+}
+
+/* --- LIENS DE MENU --- */
+.nav-menu {
+  display: flex;
+  gap: 4px; /* gap-1 */
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+/* État Hover */
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* État Actif (page actuelle) */
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+.nav-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* --- RESPONSIVE --- */
+.nav-label {
+  display: none; /* Cache le texte par défaut (mobile) */
+}
+
+@media (min-width: 768px) {
+  .nav-label {
+    display: inline; /* Affiche le texte à partir de 768px (md) */
+  }
+}

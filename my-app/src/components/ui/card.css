@@ -7,3 +7,23 @@
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
+.card {
+  /* bg-card */
+  background-color: var(--card); /* Utilise une variable ou une couleur fixe comme #ffffff */
+  
+  /* text-card-foreground */
+  color: var(--card-foreground); /* Couleur du texte, ex: #1f2937 */
+  
+  /* flex flex-col */
+  display: flex;
+  flex-direction: column;
+  
+  /* gap-6 (6 * 4px = 24px) */
+  gap: 24px;
+  
+  /* rounded-xl */
+  border-radius: 12px;
+  
+  /* border */
+  border: 1px solid #e5e7eb; /* Une bordure légère standard */
+}
