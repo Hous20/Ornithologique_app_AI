@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom"; // Assure-toi d'utiliser r
 import { Bird, Home, Table, Plus, ImagePlus } from "lucide-react";
 import "./Navigation.css";
 
-export function Navigation() {
+function Navigation() {
   const location = useLocation();
 
   const navItems = [
@@ -46,3 +46,5 @@ export function Navigation() {
     </nav>
   );
 }
+
+export default Navigation

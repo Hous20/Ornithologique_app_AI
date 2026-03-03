@@ -66,3 +66,79 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+/* --- Base du Badge --- */
+.badge-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px; /* rounded-md */
+  border: 1px solid transparent;
+  padding: 2px 8px; /* px-2 py-0.5 */
+  font-size: 12px; /* text-xs */
+  font-weight: 500;
+  width: fit-content;
+  white-space: nowrap;
+  flex-shrink: 0;
+  gap: 4px; /* gap-1 */
+  transition: color 0.2s, box-shadow 0.2s; /* transition-[color,box-shadow] */
+  overflow: hidden;
+}
+
+/* Gestion des icônes SVG à l'intérieur du badge */
+.badge-base svg {
+  width: 12px; /* size-3 */
+  height: 12px;
+  pointer-events: none;
+}
+
+/* --- Variantes de couleurs --- */
+
+/* Default (Principal) */
+.badge-default {
+  background-color: #1f2937; /* bg-primary */
+  color: #ffffff; /* text-primary-foreground */
+}
+
+/* Secondary */
+.badge-secondary {
+  background-color: #f3f4f6; /* bg-secondary */
+  color: #111827; /* text-secondary-foreground */
+}
+
+/* Destructive (Rouge/Danger) */
+.badge-destructive {
+  background-color: #ef4444; /* bg-destructive */
+  color: #ffffff;
+}
+
+/* Outline (Bordure uniquement) */
+.badge-outline {
+  border-color: #e5e7eb;
+  color: #1f2937;
+  background-color: transparent;
+}
+
+/* --- États au survol (uniquement si c'est un lien 'a') --- */
+a.badge-default:hover { background-color: #374151; }
+a.badge-secondary:hover { background-color: #e5e7eb; }
+a.badge-destructive:hover { background-color: #dc2626; }
+a.badge-outline:hover { background-color: #f9fafb; }
+/* --- Base du Séparateur --- */
+.separator-root {
+  background-color: var(--border-color, #e5e7eb); /* Utilise ta variable de bordure */
+  flex-shrink: 0;
+}
+
+/* --- Orientation Horizontale (Par défaut) --- */
+.separator-root[data-orientation="horizontal"] {
+  height: 1px; /* h-px */
+  width: 100%; /* w-full */
+  margin: 16px 0; /* Optionnel : ajoute un peu d'espace haut/bas */
+}
+
+/* --- Orientation Verticale --- */
+.separator-root[data-orientation="vertical"] {
+  width: 1px; /* w-px */
+  height: 100%; /* h-full */
+  margin: 0 16px; /* Optionnel : ajoute un peu d'espace gauche/droite */
+}

@@ -5,6 +5,7 @@ import DetailsOiseau from "./pages/DetailsOiseau";
 import AjoutOiseau from "./pages/AjoutOiseau";
 import TableauComparatif from "./pages/TableauOiseaux";
 import AjoutImage from "./pages/AjoutImage";
+import ListOiseau from "./pages/ListOiseau";
 
 const router = createBrowserRouter([
     {
@@ -12,8 +13,9 @@ const router = createBrowserRouter([
         Component: Root,
         children: [
             {index: true, Component: Home },
-            {path: "Oiseau", Component: DetailsOiseau},
+            {path: "Oiseau", Component: ListOiseau},
             {path: "add-species", Component: AjoutOiseau},
+            {path: "Oiseau/:id", Component: DetailsOiseau},
             {path: "table", Component: TableauComparatif},
             {path: "add-image", Component: AjoutImage},
         ]

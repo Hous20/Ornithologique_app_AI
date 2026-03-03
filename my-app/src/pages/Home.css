@@ -86,6 +86,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 80px 20px;
+  background-color: var(--bg-page);
 }
 
 .section-title {
@@ -104,6 +105,7 @@
   margin-bottom: 64px;
 }
 
+
 .feature-card {
   background: var(--white-glass);
   backdrop-filter: blur(8px);
@@ -117,7 +119,11 @@
   transform: translateY(-8px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
-
+.icon_card {
+  width: 24px;
+  height: 24px;
+  color: white;
+}
 .feature-icon {
   width: 48px;
   height: 48px;
@@ -261,4 +267,39 @@
 
 .card-footer {
   padding: 0 24px 24px 24px;
+}
+
+/* Le conteneur qui prend tout l'écran */
+.error-container {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #f0f9ff, #ecfdf5); /* De sky-50 à emerald-50 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Le bloc de texte centré */
+.error-content {
+  text-align: center;
+}
+
+/* Le titre de l'erreur */
+.error-title {
+  margin-bottom: 16px;
+  color: #1f2937; /* text-gray-800 */
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Le lien de retour */
+.back-link {
+  color: #0891b2; /* text-cyan-600 */
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: #0e7490; /* text-cyan-700 */
+  text-decoration: underline;
 }

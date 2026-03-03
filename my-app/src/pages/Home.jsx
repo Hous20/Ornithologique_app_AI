@@ -9,29 +9,33 @@ function Home() {
       icon: BookOpen,
       title: "Explorer les espèces",
       description: "Découvrez plus de 20 espèces d'oiseaux du monde entier",
-      link: "/Oiseau",
-      color: "from-cyan-500 to-blue-500"
+      link: "/birds",
+      // Dégradé Cyan vers Bleu
+      color: "linear-gradient(135deg, #06b6d4, #3b82f6)" 
     },
     {
       icon: Table,
       title: "Tableau comparatif",
       description: "Comparez les oiseaux selon différents critères",
       link: "/table",
-      color: "from-emerald-500 to-green-500"
+      // Dégradé Émeraude vers Vert
+      color: "linear-gradient(135deg, #10b981, #22c55e)"
     },
     {
       icon: Plus,
       title: "Ajouter une espèce",
       description: "Contribuez en ajoutant de nouvelles espèces",
       link: "/add-species",
-      color: "from-orange-500 to-amber-500"
+      // Dégradé Orange vers Ambre
+      color: "linear-gradient(135deg, #f97316, #f59e0b)"
     },
     {
       icon: ImagePlus,
       title: "Ajouter une image",
       description: "Enrichissez la base avec vos photos",
       link: "/add-image",
-      color: "from-violet-500 to-purple-500"
+      // Dégradé Violet vers Pourpre
+      color: "linear-gradient(135deg, #8b5cf6, #a855f7)"
     }
   ];
   
@@ -51,10 +55,10 @@ function Home() {
               Découvrez leurs caractéristiques, habitats et comportements.
             </p>
             <Link
-              to="/birds"
+              to="/Oiseau"
               className="btn-primary"
             >
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="btn_sparkles" />
                 Commencer l' exploration
             </Link>
           </div>
@@ -76,8 +80,9 @@ function Home() {
               <Link key={feature.link} to={feature.link}>
                 <Card className="feature-card">
                   <CardContent className="feature-card-content">
-                    <div className="feature-icon">
-                      <Icon className="w-6 h-6 text-white" />
+                    <div className="feature-icon"
+                      style={{ background: feature.color }}>
+                      <Icon className="icon_card" />
                     </div>
                     <h3 className="feature-title">{feature.title}</h3>
                     <p className="feature-description">{feature.description}</p>

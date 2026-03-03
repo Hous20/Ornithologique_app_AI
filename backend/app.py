@@ -2,37 +2,50 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from sqlalchemy import create_engine, text
 
-# Initialiser l'application Flask
 app = Flask(__name__)
-CORS(app) # Autoriser React à communiquer avec Flask
+CORS(app)
 
-# Creaction de la base de données SQLite
+# Connexion à la base de données
 engine = create_engine('sqlite:///birds.db')
 
-table_creation_list_query = ["""CREATE TABLE IF NOT EXISTS  Espece (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nom VARCHAR(100) NOT NULL,
-    nombre_individus INTEGER,
-    longevite VARCHAR(50),
-    taille VARCHAR(50),
-    poids VARCHAR(50),
-    taxonomie_id INTEGER,
-    FOREIGN KEY (taxonomie_id) REFERENCES Taxonomie(id)
-);""", """CREATE TABLE IF NOT EXISTS Pays (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nom VARCHAR(100) NOT NULL
-);""", """CREATE TABLE IF NOT EXISTS Auteur (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nom VARCHAR(100) NOT NULL
-);""", """CREATE TABLE IF NOT EXISTS  Image (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    url VARCHAR(255) NOT NULL,
-    espece_id INTEGER,
-    auteur_id INTEGER,
-    FOREIGN KEY (espece_id) REFERENCES Espece(id),
-    FOREIGN KEY (auteur_id) REFERENCES Auteur(id)
-);"""]
+# 1. LISTE DE CRÉATION (L'ordre est vital ici)
+table_creation_list_query = [
+    # On crée d'abord la table dont les autres dépendent
+    """CREATE TABLE IF NOT EXISTS Taxonomie (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ordre VARCHAR(100),
+        famille VARCHAR(100),
+        genre VARCHAR(100)
+    );""",
+    """CREATE TABLE IF NOT EXISTS Espece (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom VARCHAR(100) NOT NULL,
+        nombre_individus INTEGER,
+        longevite VARCHAR(50),
+        taille VARCHAR(50),
+        poids VARCHAR(50),
+        status VARCHAR(50) DEFAULT 'Stable',
+        taxonomie_id INTEGER,
+        FOREIGN KEY (taxonomie_id) REFERENCES Taxonomie(id)
+    );""",
+    """CREATE TABLE IF NOT EXISTS Auteur (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nom VARCHAR(100) NOT NULL
+    );""",
+    """CREATE TABLE IF NOT EXISTS Image (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        url VARCHAR(255) NOT NULL,
+        espece_id INTEGER,
+        auteur_id INTEGER,
+        FOREIGN KEY (espece_id) REFERENCES Espece(id),
+        FOREIGN KEY (auteur_id) REFERENCES Auteur(id)
+    );"""
+]
 
+# On lance la création des tables
+with engine.begin() as conn:
+    for query in table_creation_list_query:
+        conn.execute(text(query))
 # Liste des requêtes d'insertion pour peupler la base de données
 # Utilise "INSERT OR IGNORE" pour éviter les erreurs "UNIQUE constraint failed"
 table_insert_queries = [
@@ -141,30 +154,56 @@ table_insert_queries = [
 ]
 
 # Creation de la table "birds" si elle n'existe pas déjà
-for query in table_creation_list_query:
-    with engine.begin() as conn:
-        # On execute le SQL de création
-        conn.execute(text(f"{query}")); 
-        
-    conn.commit()
-# Insertion des données dans la table "birds" en utilisant les requêtes d'insertion sécurisées
-for query in table_insert_queries:
-    with engine.connect() as conn:
+
+# Insertion des données
+with engine.connect() as conn:
+    for query in table_insert_queries:
         try:
             conn.execute(text(query))
             conn.commit()
         except Exception as e:
-            print(f"Erreur lors de l'insertion : {e}")
-            
+            print(f"Erreur insertion: {e}")    
             
 @app.route('/api/birds', methods=['GET'])
 def get_birds():
+    query = """
+        SELECT e.id, e.nom, t.ordre, t.famille, i.url as imageUrl
+        FROM Espece e
+        JOIN Taxonomie t ON e.taxonomie_id = t.id
+        LEFT JOIN Image i ON e.id = i.espece_id
+    """
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM Taxonomie;"))
-        result_map = result.mappings() # Convertir les résultats en dictionnaires
-        all_results = [dict(row) for row in result_map.all()] 
+        result = conn.execute(text(query))
+        all_birds = [dict(row) for row in result.mappings()] 
     
-    return jsonify(all_results), 200 # Retourner les résultats au format JSON 200 signifie succès
+    return jsonify(all_birds), 200
+
+# Fonction pour récupérer les détails d'un oiseau spécifique par son ID
+@app.route('/api/birds/<int:bird_id>', methods=['GET'])
+def get_bird_details(bird_id):
+    query = """
+        SELECT e.*, t.ordre, t.famille, t.genre, i.url as imageUrl
+        FROM Espece e
+        JOIN Taxonomie t ON e.taxonomie_id = t.id
+        LEFT JOIN Image i ON e.id = i.espece_id
+        WHERE e.id = :id
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text(query), {"id": bird_id})
+        bird = result.mappings().first()
+        
+        if not bird:
+            return jsonify({"error": "Oiseau non trouvé"}), 404
+            
+        # On reformate un peu pour coller à ta structure React (bird.taxonomie.ordre)
+        bird_dict = dict(bird)
+        bird_dict['taxonomie'] = {
+            "ordre": bird_dict.pop('ordre'),
+            "famille": bird_dict.pop('famille'),
+            "genre": bird_dict.pop('genre')
+        }
+        
+    return jsonify(bird_dict), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
