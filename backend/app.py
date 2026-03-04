@@ -164,10 +164,10 @@ with engine.connect() as conn:
         except Exception as e:
             print(f"Erreur insertion: {e}")    
             
-@app.route('/api/birds', methods=['GET'])
+@app.route('/api/Oiseau', methods=['GET'])
 def get_birds():
     query = """
-        SELECT e.id, e.nom, t.ordre, t.famille, i.url as imageUrl
+        SELECT e.id, e.nom, t.ordre, t.famille, i.url as imageUrl, e.nombre_individus, e.taille, e.longevite
         FROM Espece e
         JOIN Taxonomie t ON e.taxonomie_id = t.id
         LEFT JOIN Image i ON e.id = i.espece_id
@@ -179,7 +179,7 @@ def get_birds():
     return jsonify(all_birds), 200
 
 # Fonction pour récupérer les détails d'un oiseau spécifique par son ID
-@app.route('/api/birds/<int:bird_id>', methods=['GET'])
+@app.route('/api/Oiseau/<int:bird_id>', methods=['GET'])
 def get_bird_details(bird_id):
     query = """
         SELECT e.*, t.ordre, t.famille, t.genre, i.url as imageUrl
@@ -205,5 +205,16 @@ def get_bird_details(bird_id):
         
     return jsonify(bird_dict), 200
 
+@app.route('/api/Oiseau/details', methods=['GET'])
+def get_birds_detail_Info_Population_taille():
+    query = """
+        SELECT e.id, e.nom, e.nombre_individus, e.taille
+        FROM Espece e
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text(query))
+        birds_info = [dict(row) for row in result.mappings()] 
+    
+    return jsonify(birds_info), 200
 if __name__ == '__main__':
     app.run(debug=True)

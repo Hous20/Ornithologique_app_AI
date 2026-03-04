@@ -84,8 +84,8 @@ export function DetailsOiseau() {
 
         <div className="info-grid">
            <Card>
-            <CardHeader><CardTitle>Informations Biométriques</CardTitle></CardHeader>
-            <CardContent className="gap-6 flex flex-col">
+            <CardHeader><CardTitle className="CardTitle">Informations Biométriques</CardTitle></CardHeader>
+            <CardContent className="card-content">
               <div className="feature-item">
                 <div className="icon-box" style={{background: '#ecfeff'}}><Ruler color="#0891b2" /></div>
                 <div><span className="label-sm">Taille</span><p className="value-md">{Oiseau.taille}</p></div>

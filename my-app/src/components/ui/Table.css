@@ -1,0 +1,51 @@
+/* Conteneur pour le scroll horizontal sur mobile */
+.table-container {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Base de la table */
+.table-ui {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px; /* text-sm */
+  text-align: left;
+}
+
+/* En-tête */
+.table-header tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table-head {
+  height: 40px;
+  padding: 0 8px;
+  vertical-align: middle;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
+
+/* Corps de la table */
+.table-row {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s;
+}
+
+.table-row:hover {
+  background-color: rgba(243, 244, 246, 0.5); /* bg-muted/50 */
+}
+
+.table-cell {
+  padding: 8px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Pied de page */
+.table-footer {
+  background-color: rgba(243, 244, 246, 0.5);
+  border-top: 1px solid #e5e7eb;
+  font-weight: 500;
+}
