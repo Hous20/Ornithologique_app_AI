@@ -6,6 +6,7 @@ import { Button } from "../components/ui/button";
 import { Textarea } from "../components/ui/textarea";
 import { Bird, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { addBird } from "../services/api";
 import "./AjoutOiseau.css";
 
 export default function AddSpecies() {
@@ -13,21 +14,15 @@ export default function AddSpecies() {
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     nomCommun: "",
-    nomScientifique: "",
     ordre: "",
     famille: "",
     genre: "",
     nombreIndividus: "",
     longevite: "",
     taille: "",
-    poidsMin: "",
-    poidsMax: "",
-    habitat: "",
-    distribution: "",
-    description: "",
-    comportement: "",
-    alimentation: "",
-    reproduction: "",
+    poids: "",
+    status: "Stable",
+    notes: "",
   });
 
   const handleChange = (e) => {
@@ -40,18 +35,9 @@ export default function AddSpecies() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/birds", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        toast.success("Espèce enregistrée !");
-        setSubmitted(true);
-      } else {
-        toast.error("Erreur lors de l'enregistrement");
-      }
+      await addBird(formData);
+      toast.success("Espèce enregistrée !");
+      setSubmitted(true);
     } catch {
       toast.error("Connexion au serveur impossible");
     } finally {
@@ -94,10 +80,6 @@ export default function AddSpecies() {
                 <Label htmlFor="nomCommun">Nom commun</Label>
                 <Input name="nomCommun" id="nomCommun" placeholder="Ex: Martin-pêcheur" onChange={handleChange} required />
               </div>
-              <div className="field-group">
-                <Label htmlFor="nomScientifique">Nom scientifique</Label>
-                <Input name="nomScientifique" id="nomScientifique" placeholder="Ex: Alcedo atthis" onChange={handleChange} required />
-              </div>
             </CardContent>
           </Card>
 
@@ -136,18 +118,29 @@ export default function AddSpecies() {
                 <Label htmlFor="nombreIndividus">Population estimée</Label>
                 <Input name="nombreIndividus" id="nombreIndividus" type="number" onChange={handleChange} required />
               </div>
+              <div className="field-group">
+                <Label htmlFor="poids">Poids (ex: 500-750g)</Label>
+                <Input name="poids" id="poids" placeholder="Ex: 500-750g" onChange={handleChange} required />
+              </div>
+              <div className="field-group">
+                <Label htmlFor="status">Statut</Label>
+                <Input name="status" id="status" placeholder="Ex: Stable" value={formData.status} onChange={handleChange} required />
+              </div>
             </CardContent>
           </Card>
 
-          {/* Section 4 : Écologie */}
+          {/* Section 4 : Notes (non persistées pour l'instant) */}
           <Card className="glass-card">
-            <CardHeader><CardTitle className="card_title">Habitat & Comportement</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="card_title">Notes complémentaires</CardTitle></CardHeader>
             <CardContent className="field-group">
-              <Label htmlFor="description">Description générale</Label>
-              <Textarea name="description" id="description" rows={3} onChange={handleChange} required />
-              
-              <Label htmlFor="habitat" className="mt-4">Type d'habitat</Label>
-              <Input name="habitat" id="habitat" placeholder="Ex: Forêts tropicales, zones humides" onChange={handleChange} required />
+              <Label htmlFor="notes">Description / habitat (optionnel)</Label>
+              <Textarea
+                name="notes"
+                id="notes"
+                rows={3}
+                placeholder="Info utile pour toi (pas encore stockée dans la table Espece)."
+                onChange={handleChange}
+              />
             </CardContent>
           </Card>
 

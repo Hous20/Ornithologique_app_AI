@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { Button } from "../components/ui/button";
 import { ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from "lucide-react";
+import { getBirdsDetailsTable } from "../services/api";
 import "./TableauOiseaux.css";
 
 export default function TableauOiseaux() {
@@ -12,12 +13,16 @@ export default function TableauOiseaux() {
   const [sortOrder, setSortOrder] = useState(null);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/Oiseau/details")
-      .then(res => res.json())
-      .then(data => {
+    async function loadDetails() {
+      try {
+        const data = await getBirdsDetailsTable();
         setBirds(data);
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+
+    loadDetails();
   }, []);
 
   const handleSort = (field) => {

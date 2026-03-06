@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button";
 import { Upload, Brain, CheckCircle2, Loader2, Search } from "lucide-react";
 import { toast } from "sonner";
+import { detectBird } from "../services/api";
 import "./OiseauDetection.css";
 
 export default function BirdDetection() {
@@ -23,23 +24,16 @@ export default function BirdDetection() {
   const runDetection = async () => {
     if (!image) return;
     setLoading(true);
-    
-    const data = new FormData();
-    data.append("image", image);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/detect", {
-        method: "POST",
-        body: data,
-      });
-      const resData = await response.json();
+      const resData = await detectBird(image);
       setResult(resData);
       
       if (resData.auto_saved) {
         toast.success("IA sûre d'elle : Espèce ajoutée automatiquement !");
       }
     } catch (err) {
-      toast.error("Erreur lors de l'analyse");
+      toast.error(err?.message || "Erreur lors de l'analyse");
     } finally {
       setLoading(false);
     }

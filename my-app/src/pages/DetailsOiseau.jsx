@@ -4,6 +4,7 @@ import { Badge } from "../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Separator } from "../components/ui/separator";
 import { ArrowRight, ArrowLeft, MapPin, Calendar, Ruler, Weight, Users, Heart, Utensils, Baby, TreePine } from "lucide-react";
+import { getBirdDetails } from "../services/api";
 import "./DetailsOiseau.css";
 
 export function DetailsOiseau() {
@@ -15,19 +16,18 @@ export function DetailsOiseau() {
 
   // 3. Récupération des données au montage du composant
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/api/Oiseau/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Oiseau non trouvé");
-        return res.json();
-      })
-      .then((data) => {
+    async function loadBird() {
+      try {
+        const data = await getBirdDetails(id);
         setBird(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+
+    loadBird();
   }, [id]);
 
   // 4. Gestion de l'état de chargement

@@ -5,6 +5,7 @@ import { Label } from "../components/ui/label";
 import { Button } from "../components/ui/button";
 import { ImagePlus, Upload, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { addBirdImage, getBirds } from "../services/api";
 import "./AjoutImage.css";
 
 export default function AddImage() {
@@ -21,10 +22,16 @@ export default function AddImage() {
 
   // Charger la liste des oiseaux au démarrage
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/Oiseau")
-      .then(res => res.json())
-      .then(data => setBirds(data))
-      .catch(() => toast.error("Impossible de charger la liste des oiseaux"));
+    async function loadBirds() {
+      try {
+        const data = await getBirds();
+        setBirds(data);
+      } catch {
+        toast.error("Impossible de charger la liste des oiseaux");
+      }
+    }
+
+    loadBirds();
   }, []);
 
   const handleFileChange = (e) => {
@@ -42,41 +49,29 @@ export default function AddImage() {
     e.preventDefault();
     setLoading(true);
 
-    const data = new FormData();
-    data.append("espece_id", selectedSpecies);
-    if (imageFile) {
-      data.append("image", imageFile);
-    } else if (imageUrl) {
-      let finalUrl = imageUrl.trim();
-      if (finalUrl && !/^https?:\/\//i.test(finalUrl)) {
-        finalUrl = 'https://' + finalUrl; // assume https
-      }
-      data.append("url", finalUrl);
-    }
-    // no extra metadata
-
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/images", {
-        method: "POST",
-        body: data, // FormData s'occupe tout seul des Headers
+      await addBirdImage({
+        especeId: Number(selectedSpecies),
+        imageFile,
+        imageUrl,
       });
 
-      if (response.ok) {
-        toast.success("Image ajoutée !");
-        setSubmitted(true);
-        // after a short delay, reset form to allow another upload
-        setTimeout(() => {
-          setSubmitted(false);
-          setSelectedSpecies("");
-          setImageFile(null);
-          setImagePreview("");
-          setImageUrl("");
-        }, 3000);
+      toast.success("Image ajoutée !");
+      setSubmitted(true);
+      // after a short delay, reset form to allow another upload
+      setTimeout(() => {
+        setSubmitted(false);
+        setSelectedSpecies("");
+        setImageFile(null);
+        setImagePreview("");
+        setImageUrl("");
+      }, 3000);
+    } catch (err) {
+      if (err?.code === "DUPLICATE_IMAGE") {
+        toast.error("Image déjà enregistrée pour cette espèce");
       } else {
         toast.error("Erreur lors de l'envoi");
       }
-    } catch (err) {
-      toast.error("Erreur serveur");
     } finally {
       setLoading(false);
     }

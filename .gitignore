@@ -2,3 +2,8 @@
 my-app/node_modules
 .env
 backend/birds.db
+birds.db
+my-app/.env.local
+my-app/.env.production.local
+my-app/dist
+backend/.env

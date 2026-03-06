@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import {ArrowRight , List, Loader2 } from "lucide-react";
+import { getBirds } from "../services/api";
 import "./ListOiseau.css";
 
 export function ListOiseau() {
@@ -10,16 +11,18 @@ export function ListOiseau() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/Oiseau")
-      .then((res) => res.json())
-      .then((data) => {
+    async function loadBirds() {
+      try {
+        const data = await getBirds();
         setBirds(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Erreur API:", err);
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+
+    loadBirds();
   }, []);
 
   const getStatusClass = (status) => {
