@@ -21,3 +21,5 @@ Le projet est maintenant orienté **Supabase-first** avec un **frontend React/Vi
 - Les variables frontend Supabase sont à renseigner dans Render (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`).
 
 > Pour plus de détails, reportez-vous au fichier DOCS.md.
+```
+note : La partie concernant l'ia détéction ne fonctionne pas encore dû à un problème avec hugginface
