@@ -20,4 +20,3 @@ Le projet combine un **backend Flask/SQLite** et un **frontend React/Vite**. Vou
 3. Accéder à `http://localhost:5173` dans votre navigateur.
 
 > Pour plus de détails, reportez-vous au fichier DOCS.md.
-

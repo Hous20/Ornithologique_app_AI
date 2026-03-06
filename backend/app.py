@@ -5,6 +5,7 @@ import os
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 import requests
+import time
 
 
 app = Flask(__name__)
@@ -317,48 +318,107 @@ def add_image():
 
 # token Hugging Face
 HF_TOKEN = os.getenv("HF_TOKEN")
-HF_API_URL = "https://api-inference.huggingface.co/models/chriamue/bird-species-classifier"
-headers = {"Authorization": HF_TOKEN}
+# OPTION A : Le plus récent (526 espèces)
+# MODEL_ID = "prithivMLmods/Bird-Species-Classifier-526"
+
+# OPTION B : Le classique (525 espèces)
+MODEL_ID = "dennisjooo/Birds-Classifier-EfficientNetB2"
+
+# L'URL du Router officielle pour 2026
+HF_API_URL = f"https://router.huggingface.co/hf-inference/models/{MODEL_ID}"
+headers = {
+    "Authorization": f"Bearer {HF_TOKEN}",
+    "Content-Type": "application/json",
+    "x-wait-for-model": "true"
+}
 
 @app.route('/api/detect', methods=['POST'])
 def detect_bird():
-    if 'image' not in request.files:
-        return jsonify({"error": "Pas d'image fournie"}), 400
-    
-    file = request.files['image']
-    image_data = file.read() # Lire l'image en binaire pour l'IA
-    
-    # 1. Appel à l'IA Hugging Face
-    response = requests.post(HF_API_URL, headers=headers, data=image_data)
-    if response.status_code != 200:
-        return jsonify({"error": "L'IA ne répond pas"}), 500
-    
-    predictions = response.json() # Ex: [{"label": "Aigle Royal", "score": 0.95}, ...]
-    best_prediction = predictions[0]
-    
-    label = best_prediction['label']
-    score = best_prediction['score']
-    
-    # 2. Automatisation (Bonus+) : Si score > 0.9, on enregistre en base
-    auto_saved = False
-    if score > 0.9:
-        # Sauvegarde physique du fichier
-        filename = secure_filename(file.filename)
-        upload_path = os.path.join('static/uploads', filename)
+    try:
+        if 'image' not in request.files:
+            return jsonify({"error": "Pas d'image fournie"}), 400
         
-        # On remet le curseur au début pour sauvegarder le fichier après l'avoir lu
-        file.seek(0)
-        file.save(upload_path)
+        file = request.files['image']
+        image_data = file.read()
         
-        # LOGIQUE SQL : On cherche si l'espèce existe déjà pour lier l'image
-        # Si oui, on insère dans la table Image automatiquement
-        auto_saved = True
+        if not HF_TOKEN:
+            return jsonify({"error": "Token HF manquant dans les variables d'environnement"}), 500
 
-    return jsonify({
-        "species": label,
-        "confidence": round(score * 100, 2),
-        "auto_saved": auto_saved
-    })
+        headers = {
+            "Authorization": f"Bearer {HF_TOKEN}",
+            "x-wait-for-model": "true"
+            # ✅ Plus de Content-Type json
+        }
 
+        max_retries = 3
+        response = None
+
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(
+                    HF_API_URL,
+                    headers=headers,
+                    data=image_data,   # ✅ bytes bruts, plus de json=
+                    timeout=60
+                )
+
+                if response.status_code == 503:
+                    wait_time = (attempt + 1) * 10
+                    print(f"[HF] Modèle en chargement, tentative {attempt + 1}/{max_retries}, attente {wait_time}s...")
+                    time.sleep(wait_time)
+                    continue
+
+                if response.status_code != 200:
+                    print(f"[HF] Erreur {response.status_code} : {response.text}")
+                    return jsonify({
+                        "error": "L'IA ne répond pas correctement",
+                        "details": response.text
+                    }), response.status_code
+
+                break
+
+            except requests.exceptions.Timeout:
+                print(f"[HF] Timeout tentative {attempt + 1}/{max_retries}")
+                if attempt == max_retries - 1:
+                    return jsonify({"error": "L'IA ne répond pas (timeout après 3 tentatives)"}), 504
+                time.sleep(5)
+
+            except requests.exceptions.RequestException as e:
+                print(f"[HF] Erreur réseau : {str(e)}")
+                return jsonify({"error": "Erreur réseau", "message": str(e)}), 502
+
+        if response is None or response.status_code == 503:
+            return jsonify({
+                "error": "Le modèle IA est en cours de démarrage, réessaie dans 30 secondes."
+            }), 503
+
+        predictions = response.json()
+
+        if not predictions or not isinstance(predictions, list):
+            return jsonify({"error": "Résultat d'analyse vide"}), 500
+
+        best_prediction = predictions[0]
+        label = best_prediction['label']
+        score = best_prediction['score']
+
+        auto_saved = False
+        if score > 0.9:
+            filename = secure_filename(file.filename)
+            os.makedirs('static/uploads', exist_ok=True)
+            upload_path = os.path.join('static/uploads', filename)
+            file.seek(0)
+            file.save(upload_path)
+            auto_saved = True
+
+        return jsonify({
+            "species": label,
+            "confidence": round(score * 100, 2),
+            "auto_saved": auto_saved
+        })
+
+    except Exception as e:
+        print(f"CRASH SERVEUR : {str(e)}")
+        return jsonify({"error": "Erreur interne du serveur", "message": str(e)}), 500
+        
 if __name__ == '__main__':
     app.run(debug=True)
