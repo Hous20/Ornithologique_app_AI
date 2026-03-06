@@ -1,6 +1,7 @@
 # Ornithologique_app_AI
 ```Site de l'appli```
-```https://ornithologique-app-ai-oiseau.onrender.com```
+_https://ornithologique-app-ai-oiseau.onrender.com_
+
 Application web éducative et collaborative dédiée aux oiseaux du monde. Les utilisateurs peuvent consulter des espèces, comparer des caractéristiques, ajouter de nouvelles espèces et soumettre des photographies. Une page de détection IA permet d'identifier un oiseau à partir d'une image.
 
 Le projet est maintenant orienté **Supabase-first** avec un **frontend React/Vite** déployé en static sur Render. Vous trouverez la documentation technique et le runbook de déploiement dans [DOCS.md](./DOCS.md).
