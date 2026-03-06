@@ -9,7 +9,7 @@ function Home() {
       icon: BookOpen,
       title: "Explorer les espèces",
       description: "Découvrez plus de 20 espèces d'oiseaux du monde entier",
-      link: "/birds",
+      link: "/Oiseau",
       // Dégradé Cyan vers Bleu
       color: "linear-gradient(135deg, #06b6d4, #3b82f6)" 
     },
