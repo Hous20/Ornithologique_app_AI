@@ -1,17 +1,17 @@
 .table-page {
   min-height: 100vh;
   background: linear-gradient(to bottom, #f0f9ff, #ecfdf5);
-  padding: 40px 20px;
+  padding: 2.5rem 1.25rem; /* 40px 20px */
 }
 
 .header-section {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 2.5rem; /* 40px */
 }
 .header-section h1 {
   font-size: 2.5rem;
   color: #1f2937;
-  margin-bottom: 16px;
+  margin-bottom: 1rem; /* 16px */
 }
 .header-section p {
   font-size: 1.125rem;
@@ -21,8 +21,8 @@
 .glass-card {
   background: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(12px);
-  border-radius: 16px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05) !important;
+  border-radius: 1rem !important; /* 16px */
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.05) !important; /* 8px 32px */
   border: none !important;
 }
 .glass-card .Card_title {
@@ -32,7 +32,7 @@
 
 .table-wrapper {
   overflow-x: auto;
-  border-radius: 12px;
+  border-radius: 0.75rem; /* 12px */
 }
 
 .table-header-row {
@@ -43,7 +43,7 @@
 .sort-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem; /* 8px */
   font-weight: 600;
   color: #374151;
 }

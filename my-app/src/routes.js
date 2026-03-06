@@ -6,6 +6,7 @@ import AjoutOiseau from "./pages/AjoutOiseau";
 import TableauComparatif from "./pages/TableauOiseaux";
 import AjoutImage from "./pages/AjoutImage";
 import ListOiseau from "./pages/ListOiseau";
+import OiseauDetection from "./pages/OiseauDetection";
 
 const router = createBrowserRouter([
     {
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
             {path: "Oiseau/:id", Component: DetailsOiseau},
             {path: "table", Component: TableauComparatif},
             {path: "add-image", Component: AjoutImage},
+            {path: "detect", Component: OiseauDetection},
         ]
     }
 ]);

@@ -1,0 +1,79 @@
+.add-image-page {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #f5f3ff, #ede9fe);
+  padding: 60px 20px;
+}
+
+.form-card {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px);
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+  margin-bottom: 24px;
+  color: #111827;
+}
+
+/* Zone d'upload stylisée (secondaire) */
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 250px;
+  border: 2px dashed #d1d5db; /* gris neutre pour dé-emphase */
+  border-radius: 12px;
+  cursor: pointer;
+  background-color: rgba(220, 220, 220, 0.03);
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+.upload-label:hover {
+  background-color: rgba(139, 92, 246, 0.1);
+  border-color: #7c3aed;
+}
+
+.upload-label:hover {
+  background-color: rgba(139, 92, 246, 0.1);
+  border-color: #7c3aed;
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-icon-container {
+  text-align: center;
+  color: #6d28d9;
+}
+
+/* Style du Select standard */
+.select-ui {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  color: #111827;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+}
+
+.select-ui:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.btn-purple {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important;
+  color: white !important;
+  padding: 16px 32px !important;
+  border-radius: 50px !important;
+  font-size: 1.1rem !important;
+  box-shadow: 0 4px 15px rgba(109, 40, 217, 0.3) !important;
+}

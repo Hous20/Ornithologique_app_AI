@@ -40,7 +40,7 @@ function Home() {
   ];
   
   return (
-    <div>
+    <div className="home-page">
       <div className="hero-section">
         <div className="header_content">
           <div className="hero-text-center">
@@ -115,7 +115,6 @@ function Home() {
           </div>
         </div>
       </div>
-
       <div className="info-section">
         <div className="info-content">
           <h3 className="info-title">Contribuez à notre encyclopédie</h3>

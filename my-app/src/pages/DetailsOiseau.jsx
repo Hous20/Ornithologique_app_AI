@@ -68,7 +68,12 @@ export function DetailsOiseau() {
         <div className="Oiseau-header-card">
           <div className="Oiseau-image-container">
             {/* imageUrl correspond au AS imageUrl de ta requête SQL */}
-            <img src={Oiseau.imageUrl} alt={Oiseau.nom} className="Oiseau-image" />
+            <img
+              src={Oiseau.imageUrl || 'https://via.placeholder.com/300x200?text=Image+manquante'}
+              alt={Oiseau.nom}
+              className="Oiseau-image"
+              onError={(e)=>{ e.target.src='https://via.placeholder.com/300x200?text=Image+manquante'; }}
+            />
           </div>
           <div className="Oiseau-info-main">
             <div className="mb-4">

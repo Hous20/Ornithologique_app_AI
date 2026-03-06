@@ -1,0 +1,40 @@
+/* --- Style de base du Textarea --- */
+.textarea-ui {
+  display: flex;
+  width: 100%;
+  min-height: 5rem; /* min-h-20 80px */
+  border-radius: 0.375rem; /* 6px */
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  padding: 0.5rem 0.75rem; /* 8px 12px */
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.5;
+  color: #1f2937;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  resize: vertical; /* Permet à l'utilisateur d'agrandir vers le bas uniquement */
+}
+
+/* Placeholder */
+.textarea-ui::placeholder {
+  color: #9ca3af;
+}
+
+/* État Focus */
+.textarea-ui:focus {
+  border-color: #0891b2;
+  box-shadow: 0 0 0 0.1875rem rgba(8, 145, 178, 0.2); /* 3px */
+}
+
+/* État Désactivé */
+.textarea-ui:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: #f3f4f6;
+}
+
+/* État Invalide */
+.textarea-ui[aria-invalid="true"] {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 0.1875rem rgba(239, 68, 68, 0.2); /* 3px */
+}

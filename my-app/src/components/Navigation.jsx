@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom"; // Assure-toi d'utiliser react-router-dom
-import { Bird, Home, Table, Plus, ImagePlus } from "lucide-react";
+import { Bird, Home, Table, Plus, ImagePlus, Brain } from "lucide-react";
 import "./Navigation.css";
 
 function Navigation() {
@@ -11,6 +11,7 @@ function Navigation() {
     { path: "/table", label: "Tableau", icon: Table },
     { path: "/add-species", label: "Ajouter espèce", icon: Plus },
     { path: "/add-image", label: "Ajouter image", icon: ImagePlus },
+    { path: "/detect", label: "Détection IA", icon: Brain },
   ];
 
   return (

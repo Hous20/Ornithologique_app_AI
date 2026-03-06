@@ -19,10 +19,10 @@
   flex-direction: column;
   
   /* gap-6 (6 * 4px = 24px) */
-  gap: 24px;
+  gap: 1.5rem; /* 24px */
   
   /* rounded-xl */
-  border-radius: 12px;
+  border-radius: 0.75rem; /* 12px */
   
   /* border */
   border: 1px solid #e5e7eb; /* Une bordure légère standard */

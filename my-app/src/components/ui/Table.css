@@ -9,7 +9,7 @@
 .table-ui {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px; /* text-sm */
+  font-size: 0.875rem; /* text-sm 14px */
   text-align: left;
 }
 
@@ -19,8 +19,8 @@
 }
 
 .table-head {
-  height: 40px;
-  padding: 0 8px;
+  height: 2.5rem; /* 40px */
+  padding: 0 0.5rem; /* 8px */
   vertical-align: middle;
   font-weight: 500;
   color: #374151;
@@ -38,7 +38,7 @@
 }
 
 .table-cell {
-  padding: 8px;
+  padding: 0.5rem; /* 8px */
   vertical-align: middle;
   white-space: nowrap;
 }

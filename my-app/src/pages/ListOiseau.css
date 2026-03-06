@@ -1,25 +1,31 @@
 .list-page {
   min-height: 100vh;
+
   background: linear-gradient(to bottom, #f0f9ff, #ecfdf5);
-  padding: 60px 20px;
+  padding: 3.75rem 1.25rem; /* 60px 20px */
 }
 
 .list-header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 3.75rem; /* 60px */
 }
-
+.list-header h1 {
+  font-size: 2.5rem;
+  color: #1f2937;
+  margin-bottom: 0.625rem; /* 10px */
+}
 .subtitle {
   color: #4b5563;
   font-size: 1.1rem;
   max-width: 600px;
-  margin: 10px auto;
+  margin: 0.625rem auto; /* 10px */
 }
 
 .birds-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 1.875rem; /* 30px */
+  flex: 1 0 auto; /* grow to fill vertical space */
 }
 
 .card-link {
@@ -28,25 +34,32 @@
 }
 
 .bird-item-card {
-  height: 100%;
-  border-radius: 20px;
+  height: 80%;
+  justify-content: stretch;
+  border-radius: 1.25rem; /* 20px */
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
   border: none;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  box-shadow: 0 0.25rem 0.375rem -0.0625rem rgba(0,0,0,0.05); /* 4px 6px -1px */
 }
 
 .bird-item-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-0.625rem); /* -10px */
+  box-shadow: 0 1.25rem 1.5625rem -0.3125rem rgba(0, 0, 0, 0.1); /* 20px 25px -5px */
 }
 
 .card-image-wrapper {
   position: relative;
-  height: 200px;
+  height: 12.5rem; /* 200px */
   overflow: hidden;
-  border-radius: 20px 20px 0 0;
+  border-radius: 1.25rem 1.25rem 0 0;
+}
+
+/* ensure the grid and elements are visible immediately */
+.birds-grid, .bird-item-card {
+  visibility: visible;
+  opacity: 1;
 }
 
 .card-image {
@@ -62,39 +75,39 @@
 
 .card-badge-overlay {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 0.75rem; /* 12px */
+  right: 0.75rem;
 }
 
 .bird-name {
   color: #1f2937;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem; /* 4px */
 }
 
 .scientific-name {
   font-size: 0.85rem;
   color: #6b7280;
   font-style: italic;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem; /* 20px */
 }
 
 .mini-stats {
   border-top: 1px solid #f3f4f6;
-  padding-top: 15px;
-  margin-bottom: 20px;
+  padding-top: 0.9375rem; /* 15px */
+  margin-bottom: 1.25rem; /* 20px */
 }
 
 .stat-row {
   display: flex;
   justify-content: space-between;
   font-size: 0.9rem;
-  margin-bottom: 5px;
+  margin-bottom: 0.3125rem; /* 5px */
 }
 
 .card-footer-link {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem; /* 8px */
   color: #0891b2;
   font-weight: 600;
   font-size: 0.9rem;
@@ -105,7 +118,7 @@
 }
 
 .bird-item-card:hover .arrow-icon {
-  transform: translateX(5px);
+  transform: translateX(0.3125rem); /* 5px */
 }
 
 .loader-container {
@@ -114,5 +127,5 @@
   align-items: center;
   justify-content: center;
   height: 80vh;
-  gap: 20px;
+  gap: 1.25rem; /* 20px */
 }

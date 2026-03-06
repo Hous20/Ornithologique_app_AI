@@ -1,6 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from sqlalchemy import create_engine, text
+import os
+from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
+import requests
+
 
 app = Flask(__name__)
 CORS(app)
@@ -9,6 +14,12 @@ CORS(app)
 engine = create_engine('sqlite:///birds.db')
 
 # 1. LISTE DE CRÉATION (L'ordre est vital ici)
+# NOTE: if you modify table schemas (e.g. add UNIQUE constraints),
+# you must delete the existing birds.db or recreate the affected tables
+# because SQLite won't retroactively apply the changes to the file.
+# The `CREATE TABLE IF NOT EXISTS` blocks will run, but constraints won't
+# be added to an already existing table, so drop the database when
+# changing column definitions.
 table_creation_list_query = [
     # On crée d'abord la table dont les autres dépendent
     """CREATE TABLE IF NOT EXISTS Taxonomie (
@@ -38,7 +49,8 @@ table_creation_list_query = [
         espece_id INTEGER,
         auteur_id INTEGER,
         FOREIGN KEY (espece_id) REFERENCES Espece(id),
-        FOREIGN KEY (auteur_id) REFERENCES Auteur(id)
+        FOREIGN KEY (auteur_id) REFERENCES Auteur(id),
+        UNIQUE(url, espece_id)
     );"""
 ]
 
@@ -216,5 +228,137 @@ def get_birds_detail_Info_Population_taille():
         birds_info = [dict(row) for row in result.mappings()] 
     
     return jsonify(birds_info), 200
+
+@app.route('/api/birds', methods=['POST'])
+def add_bird():
+    data = request.json
+    
+    with engine.begin() as conn:
+        # 1. On insère d'abord la Taxonomie
+        tax_query = text("""
+            INSERT INTO Taxonomie (ordre, famille, genre) 
+            VALUES (:ordre, :famille, :genre)
+            RETURNING id
+        """)
+        tax_result = conn.execute(tax_query, {
+            "ordre": data['ordre'],
+            "famille": data['famille'],
+            "genre": data['genre']
+        })
+        
+        tax_id = tax_result.fetchone()[0]
+
+        # 2. On insère l'Espece avec l'ID de taxonomie récupéré
+        esp_query = text("""
+            INSERT INTO Espece (nom, nombre_individus, longevite, taille, poids, taxonomie_id)
+            VALUES (:nom, :nombre, :long, :taille, :poids, :tax_id)
+        """)
+        conn.execute(esp_query, {
+            "nom": data['nomCommun'],
+            "nombre": data['nombreIndividus'],
+            "long": f"{data['longevite']} ans",
+            "taille": f"{data['taille']} cm",
+            "poids": f"{data['poidsMin']}-{data['poidsMax']}g",
+            "tax_id": tax_id
+        })
+
+    return jsonify({"message": "Espèce ajoutée avec succès"}), 201
+
+# Dossier où stocker les images
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+@app.route('/api/images', methods=['POST'])
+def add_image():
+    # Récupérer les données texte
+    bird_id = request.form.get('speciesId')
+    # compute a pseudo-author id from User-Agent so each browser gets a stable integer
+    ua = request.headers.get('User-Agent', '')
+    auteur_id = abs(hash(ua)) % 100000 + 2  # reserve 1 for Unsplash contributor
+    
+    # ensure this auteur exists in table (name can be truncated UA)
+    with engine.begin() as conn:
+        exist = conn.execute(text("SELECT id FROM Auteur WHERE id = :id"),{"id": auteur_id}).first()
+        if not exist:
+            conn.execute(text("INSERT INTO Auteur (id, nom) VALUES (:id, :nom)"),
+                         {"id": auteur_id, "nom": ua[:100]})
+
+    # Récupérer le fichier ou le lien
+    file = request.files.get('image')
+    url = request.form.get('url')
+
+    if file:
+        # stocke le fichier et construit l'URL locale
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        url = f"/static/uploads/{filename}"
+
+    if url:
+        # check for duplicate for same species
+        with engine.connect() as conn:
+            dup = conn.execute(text("SELECT id FROM Image WHERE url = :url AND espece_id = :eid"),
+                               {"url": url, "eid": bird_id}).first()
+            if dup:
+                return jsonify({"error": "Image déjà enregistrée pour cette espèce"}), 409
+        with engine.begin() as conn:
+            img_query = text("""
+            INSERT INTO Image (url, espece_id, auteur_id)
+            VALUES (:url, :espece_id, :auteur_id)
+            """)
+
+            conn.execute(img_query, {
+                "url": url,
+                "espece_id": bird_id,
+                "auteur_id": auteur_id
+            })
+        
+    return jsonify({"message": "Image enregistrée !"}), 201
+
+
+# token Hugging Face
+HF_TOKEN = os.getenv("HF_TOKEN")
+HF_API_URL = "https://api-inference.huggingface.co/models/chriamue/bird-species-classifier"
+headers = {"Authorization": HF_TOKEN}
+
+@app.route('/api/detect', methods=['POST'])
+def detect_bird():
+    if 'image' not in request.files:
+        return jsonify({"error": "Pas d'image fournie"}), 400
+    
+    file = request.files['image']
+    image_data = file.read() # Lire l'image en binaire pour l'IA
+    
+    # 1. Appel à l'IA Hugging Face
+    response = requests.post(HF_API_URL, headers=headers, data=image_data)
+    if response.status_code != 200:
+        return jsonify({"error": "L'IA ne répond pas"}), 500
+    
+    predictions = response.json() # Ex: [{"label": "Aigle Royal", "score": 0.95}, ...]
+    best_prediction = predictions[0]
+    
+    label = best_prediction['label']
+    score = best_prediction['score']
+    
+    # 2. Automatisation (Bonus+) : Si score > 0.9, on enregistre en base
+    auto_saved = False
+    if score > 0.9:
+        # Sauvegarde physique du fichier
+        filename = secure_filename(file.filename)
+        upload_path = os.path.join('static/uploads', filename)
+        
+        # On remet le curseur au début pour sauvegarder le fichier après l'avoir lu
+        file.seek(0)
+        file.save(upload_path)
+        
+        # LOGIQUE SQL : On cherche si l'espèce existe déjà pour lier l'image
+        # Si oui, on insère dans la table Image automatiquement
+        auto_saved = True
+
+    return jsonify({
+        "species": label,
+        "confidence": round(score * 100, 2),
+        "auto_saved": auto_saved
+    })
+
 if __name__ == '__main__':
     app.run(debug=True)

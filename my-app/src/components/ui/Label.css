@@ -1,0 +1,27 @@
+/* Style de base du Label */
+.label-ui {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* 8px */
+  font-size: 0.875rem; /* 14px */
+  font-weight: 500; /* font-medium */
+  line-height: 1; /* leading-none */
+  color: #374151; /* gray-700 */
+  margin-bottom: 0.2rem;
+  user-select: none; /* select-none */
+  cursor: pointer;
+}
+
+/* Style quand l'input associé est désactivé */
+.label-ui:has(+ .input-ui:disabled),
+.label-ui.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Petit indicateur pour les champs obligatoires (optionnel) */
+.label-ui:has(+ [required])::after {
+  content: " *";
+  color: #ef4444;
+}

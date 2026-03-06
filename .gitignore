@@ -1,2 +1,4 @@
 .venv
 my-app/node_modules
+.env
+backend/birds.db

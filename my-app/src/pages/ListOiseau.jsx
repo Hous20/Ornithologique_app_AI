@@ -56,9 +56,13 @@ export function ListOiseau() {
               <Card className="Oiseau-item-card group">
                 <div className="card-image-wrapper">
                   <img
-                    src={Oiseau.imageUrl}
+                    src={Oiseau.imageUrl || 'https://via.placeholder.com/150x100?text=No+Image'}
                     alt={Oiseau.nom}
                     className="card-image"
+                    onError={(e)=>{
+                      console.warn('failed loading', Oiseau.imageUrl);
+                      e.target.src = 'https://via.placeholder.com/150x100?text=No+Image';
+                    }}
                   />
                   <div className="card-badge-overlay">
                     <Badge className={getStatusClass(Oiseau.status)}>
