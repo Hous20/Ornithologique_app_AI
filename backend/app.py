@@ -334,40 +334,46 @@ headers = {
 
 @app.route('/api/detect', methods=['POST'])
 def detect_bird():
+    """Détection de l'espèce d'oiseau à partir d'une image envoyée par l'utilisateur"""
     try:
+        # Vérifie si une image a bien été envoyée dans la requête
         if 'image' not in request.files:
             return jsonify({"error": "Pas d'image fournie"}), 400
         
         file = request.files['image']
         image_data = file.read()
         
+        # Vérifie si le token HuggingFace est présent
         if not HF_TOKEN:
             return jsonify({"error": "Token HF manquant dans les variables d'environnement"}), 500
 
+        # Prépare les headers pour l'appel à l'API HuggingFace : pas besoin de content-type car l'image est envoyée en binaire
         headers = {
             "Authorization": f"Bearer {HF_TOKEN}",
-            "x-wait-for-model": "true"
-            # ✅ Plus de Content-Type json
+            "x-wait-for-model": "true"  # Attend que le modèle soit chargé/prêt
         }
 
-        max_retries = 3
+        max_retries = 3   # On tentera au maximum 3 fois en cas d’indisponibilité temporaire/chargement du modèle
         response = None
 
+        # Tentatives d'appel à l'API HuggingFace
         for attempt in range(max_retries):
             try:
                 response = requests.post(
                     HF_API_URL,
                     headers=headers,
-                    data=image_data,   # ✅ bytes bruts, plus de json=
+                    data=image_data,   # On envoie directement les bytes de l’image
                     timeout=60
                 )
 
+                # Si le modèle est en cours de chargement, on attend et recommence
                 if response.status_code == 503:
                     wait_time = (attempt + 1) * 10
                     print(f"[HF] Modèle en chargement, tentative {attempt + 1}/{max_retries}, attente {wait_time}s...")
                     time.sleep(wait_time)
                     continue
 
+                # Si l’API retourne une autre erreur, on la transmet
                 if response.status_code != 200:
                     print(f"[HF] Erreur {response.status_code} : {response.text}")
                     return jsonify({
@@ -375,33 +381,41 @@ def detect_bird():
                         "details": response.text
                     }), response.status_code
 
+                # Succès, on arrête les tentatives
                 break
 
+            # Gestion du timeout, on réessaie sauf à la dernière tentative
             except requests.exceptions.Timeout:
                 print(f"[HF] Timeout tentative {attempt + 1}/{max_retries}")
                 if attempt == max_retries - 1:
                     return jsonify({"error": "L'IA ne répond pas (timeout après 3 tentatives)"}), 504
                 time.sleep(5)
 
+            # Autres erreurs réseau : arrêt immédiat
             except requests.exceptions.RequestException as e:
                 print(f"[HF] Erreur réseau : {str(e)}")
                 return jsonify({"error": "Erreur réseau", "message": str(e)}), 502
 
+        # Si le modèle n'a jamais répondu
         if response is None or response.status_code == 503:
             return jsonify({
                 "error": "Le modèle IA est en cours de démarrage, réessaie dans 30 secondes."
             }), 503
 
+        # Récupère la prédiction depuis l'API Hugging Face
         predictions = response.json()
 
+        # Si la réponse n'est pas une liste ou est vide : erreur !
         if not predictions or not isinstance(predictions, list):
             return jsonify({"error": "Résultat d'analyse vide"}), 500
 
+        # On utilise la meilleure prédiction (le premier résultat)
         best_prediction = predictions[0]
         label = best_prediction['label']
         score = best_prediction['score']
 
         auto_saved = False
+        # Si la confiance du modèle dépasse 90%, on sauvegarde automatiquement l’image uploadée localement
         if score > 0.9:
             filename = secure_filename(file.filename)
             os.makedirs('static/uploads', exist_ok=True)
@@ -410,12 +424,14 @@ def detect_bird():
             file.save(upload_path)
             auto_saved = True
 
+        # Retourne au front-end le nom de l’espèce prédite, le score de confiance et si l’image a été auto-sauvegardée
         return jsonify({
             "species": label,
             "confidence": round(score * 100, 2),
             "auto_saved": auto_saved
         })
 
+    # En cas de crash/exception inattendue, on log et on retourne un message d’erreur générique
     except Exception as e:
         print(f"CRASH SERVEUR : {str(e)}")
         return jsonify({"error": "Erreur interne du serveur", "message": str(e)}), 500
